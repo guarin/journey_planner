@@ -1,0 +1,11 @@
+'@context':
+  created: schema:dateCreated
+  schema: http://schema.org/
+  name: schema:name
+  updated: schema:dateUpdated
+  version: schema:schemaVersion
+'@type': schema:Project
+created: 2020-03-17T12:43:42.709Z
+name: spak-docker
+updated: 2020-03-17T12:43:42.709Z
+version: '1'
