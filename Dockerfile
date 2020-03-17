@@ -79,19 +79,19 @@ RUN echo '<?xml version="1.0"?>\n\
     </property>\n\
     <property>\n\
         <name>yarn.resourcemanager.hostname</name>\n\
-        <value>'${YARN_RM_HOSTNAME}</value>\n\
+        <value>'${YARN_RM_HOSTNAME}'</value>\n\
     </property>\n\
     <property>\n\
         <name>yarn.resourcemanager.address</name>\n\
-        <value>'${YARN_RM_ADDRESS}</value>\n\
+        <value>'${YARN_RM_ADDRESS}'</value>\n\
     </property>\n\
     <property>\n\
       <name>yarn.resourcemanager.resource-tracker.address</name>\n\
-      <value>'${YARN_RM_TRACKER}</value>\n\
+      <value>'${YARN_RM_TRACKER}'</value>\n\
     </property>\n\
     <property>\n\
       <name>yarn.resourcemanager.scheduler.address</name>\n\
-      <value>'${YARN_RM_SCHEDULER}</value>\n\
+      <value>'${YARN_RM_SCHEDULER}'</value>\n\
     </property>\n\
 </configuration>' > /usr/hdp/current/hadoop-3.1.0/etc/hadoop/yarn-site.xml
 
