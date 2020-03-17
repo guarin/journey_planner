@@ -34,10 +34,10 @@ ENV YARN_RM_TRACKER=${YARN_RM_HOSTNAME_ARG}:8025
 ENV LIVY_SERVER_URL=${LIVY_SERVER_ARG}
 ENV HADOOP_HOME=/usr/hdp/current/hadoop-3.1.0/
 ENV HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop/
-ENV SPARK_HOME=/usr/hdp/current/spark2-client/
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
-ENV PYTHONPATH=${SPARK_HOME}/python/lib/py4j-0.10.7-src.zip:${SPARK_HOME}/python
-ENV PYSPARK_PYTHON=/opt/conda/bin/python
+#ENV SPARK_HOME=/usr/hdp/current/spark2-client/
+#ENV PYTHONPATH=${SPARK_HOME}/python/lib/py4j-0.10.7-src.zip:${SPARK_HOME}/python
+#ENV PYSPARK_PYTHON=/opt/conda/bin/python
 
 # Install hdfs, spark packages
 RUN mkdir -p /usr/hdp/current && \
@@ -47,13 +47,14 @@ RUN mkdir -p /usr/hdp/current && \
     tar --no-same-owner -xf hadoop-3.1.0.tar.gz && \
     rm hadoop-3.1.0.tar.gz && \
     # Spark
-    wget -q https://archive.apache.org/dist/spark/spark-2.4.5/spark-2.4.5-bin-hadoop2.7.tgz && \
-    tar --no-same-owner -xf spark-2.4.5-bin-hadoop2.7.tgz && \
-    rm spark-2.4.5-bin-hadoop2.7.tgz && \
-    mv spark-2.4.5-bin-hadoop2.7 spark2-client && \
-    echo 'export HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop/' >> ${SPARK_HOME}/conf/spark-env.sh &&\
-    echo 'export HADOOP_USER_NAME=${JUPYTERHUB_USER}' >> ${SPARK_HOME}/conf/spark-env.sh &&\
-    echo 'spark.master yarn' >> ${SPARK_HOME}/conf/spark-defaults.conf
+    #wget -q https://archive.apache.org/dist/spark/spark-2.4.5/spark-2.4.5-bin-hadoop2.7.tgz && \
+    #tar --no-same-owner -xf spark-2.4.5-bin-hadoop2.7.tgz && \
+    #rm spark-2.4.5-bin-hadoop2.7.tgz && \
+    #mv spark-2.4.5-bin-hadoop2.7 spark2-client && \
+    #echo 'export HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop/' >> ${SPARK_HOME}/conf/spark-env.sh &&\
+    #echo 'export HADOOP_USER_NAME=${JUPYTERHUB_USER}' >> ${SPARK_HOME}/conf/spark-env.sh &&\
+    #echo 'spark.master yarn' >> ${SPARK_HOME}/conf/spark-defaults.conf && \
+    echo "Hadoop installed"
 
 # Configure Hadoop core-site.xml
 RUN echo '<?xml version="1.0" encoding="UTF-8"?>\n\
@@ -96,19 +97,26 @@ RUN echo '<?xml version="1.0"?>\n\
 </configuration>' > /usr/hdp/current/hadoop-3.1.0/etc/hadoop/yarn-site.xml
 
 # Install sparkmagic
-RUN pip install sparkmagic && \
-    # jupyter nbextension enable --py --sys-prefix widgetsnbextension && \
-    jupyter labextension install @jupyter-widgets/jupyterlab-manager && \
+USER ${NB_USER}
+
+RUN /opt/conda/bin/pip install sparkmagic && \
+    echo "JUPYTERLAB_DIR=${JUPYTERLAB_DIR:-null}" && \
+    echo "JUPYTERLAB_SETTINGS_DIR=${JUPYTERLAB_SETTINGS_DIR:-null}" && \
+    echo "JUPYTERLAB_WORKSPACES_DIR=${JUPYTERLAB_WORKSPACES_DIR:-null}" && \
+    export JUPYTERLAB_DIR=/opt/conda/share/jupyter/lab && \
+    export JUPYTERLAB_SETTINGS_DIR=/home/jovyan/.jupyter/lab/user-settings && \
+    export JUPYTERLAB_WORKSPACES_DIR=/home/jovyan/.jupyter/lab/workspaces && \
+    # /opt/conda/bin/jupyter nbextension enable --py --sys-prefix widgetsnbextension && \
+    /opt/conda/bin/jupyter labextension install -y --log-level=INFO @jupyter-widgets/jupyterlab-manager && \
     cd "$(pip show sparkmagic|sed -En 's/Location: (.*)$/\1/p')" && \
-    jupyter-kernelspec install sparkmagic/kernels/sparkkernel && \
-    jupyter-kernelspec install sparkmagic/kernels/sparkrkernel && \
-    jupyter-kernelspec install sparkmagic/kernels/pysparkkernel && \
+    jupyter-kernelspec install sparkmagic/kernels/sparkkernel --user && \
+    jupyter-kernelspec install sparkmagic/kernels/sparkrkernel --user && \
+    jupyter-kernelspec install sparkmagic/kernels/pysparkkernel --user && \
     jupyter serverextension enable --py sparkmagic
 
 # Set user environment
-USER ${NB_USER}
 RUN echo 'export HADOOP_USER_NAME=${JUPYTERHUB_USER}' >> ~/.bashrc && \
-    echo 'export PATH=${PATH}:${HADOOP_HOME}/bin:${SPARK_HOME}/bin' >> ~/.bashrc && \
+    # echo 'export PATH=${PATH}:${HADOOP_HOME}/bin:${SPARK_HOME}/bin' >> ~/.bashrc && \
     mkdir -p ~/.sparkmagic/ && \
     echo '{\n\
   "kernel_python_credentials" : {\n\
@@ -124,9 +132,6 @@ RUN echo 'export HADOOP_USER_NAME=${JUPYTERHUB_USER}' >> ~/.bashrc && \
   "livy_server_heartbeat_timeout_seconds": 60,\n\
   "heartbeat_retry_seconds": 1\n\
 }\n' > ~/.sparkmagic/config.json
-
-# switch back to notebook user
-USER ${NB_USER}
 
 # install the python dependencies
 COPY requirements.txt environment.yml /tmp/
