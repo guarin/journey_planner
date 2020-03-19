@@ -43,20 +43,20 @@ ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 
 # Install hadoop  3.1.0
 RUN mkdir -p ${HDP_HOME} && \
-    mkdir -p ${HADOOP_CONF_DIR} && \
     cd ${HDP_HOME} && \
     wget -q https://archive.apache.org/dist/hadoop/core/hadoop-3.1.0/hadoop-3.1.0.tar.gz && \
     tar --no-same-owner -xf hadoop-3.1.0.tar.gz && \
     if [ ! -d ${HADOOP_HOME} ]; then mv hadoop-3.1.0 ${HADOOP_HOME}; fi && \
+    mkdir -p ${HADOOP_CONF_DIR} && \
     rm hadoop-3.1.0.tar.gz
 
 # Install Hive 3.1.0
 RUN mkdir -p ${HDP_HOME} && \
-    mkdir -p ${HIVE_HOME}/conf && \
     cd ${HDP_HOME} && \
     wget -q https://archive.apache.org/dist/hive/hive-3.1.0/apache-hive-3.1.0-bin.tar.gz && \
     tar --no-same-owner -xf apache-hive-3.1.0-bin.tar.gz && \
     if [ ! -d ${HIVE_HOME} ]; then mv apache-hive-3.1.0-bin ${HIVE_HOME}; fi && \
+    mkdir -p ${HIVE_HOME}/conf && \
     rm apache-hive-3.1.0-bin.tar.gz
 
 # Configure Hadoop core-site.xml
