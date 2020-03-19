@@ -113,7 +113,7 @@ RUN echo '<configuration xmlns:xi="http://www.w3.org/2001/XInclude">\n\
 
 # Renku-hack modify entrypoint.sh
 RUN if [ -e /entrypoint.sh ]; then \
-    sed -i -Ee 's,^\$\@$,if \[\[ -x ~/.renkurc \]\];then . ~/.renkurc;fi\n\$\@,' /entrypoint.sh; \
+    sed -i -Ee 's,^\$\@$,if \[\[ -e ${HOME}/.renkurc \]\];then . ${HOME}/.renkurc;fi\n\$\@,' /entrypoint.sh; \
     fi
 
 USER ${NB_USER}
