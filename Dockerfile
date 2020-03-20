@@ -113,7 +113,7 @@ RUN echo '<configuration xmlns:xi="http://www.w3.org/2001/XInclude">\n\
 
 # Renku-hack modify entrypoint.sh
 RUN if [ -e /entrypoint.sh ]; then \
-    sed -i -Ee 's,^\$\@$,if \[\[ -e ${HOME}/.renkurc \]\];then . ${HOME}/.renkurc;fi\n\$\@,' /entrypoint.sh; \
+    sed -i -Ee 's,^\$\@$,. ${HOME}/.renkurc || true\n\$\@,' /entrypoint.sh; \
     fi
 
 USER ${NB_USER}
@@ -130,6 +130,10 @@ RUN /opt/conda/bin/pip install sparkmagic && \
     jupyter-kernelspec install sparkmagic/kernels/sparkrkernel --user && \
     jupyter-kernelspec install sparkmagic/kernels/pysparkkernel --user && \
     jupyter serverextension enable --py sparkmagic
+
+# Install bash kernel
+RUN /opt/conda/bin/pip install bash_kernel && \
+    python -m bash_kernel.install
 
 # Set user environment
 # + https://github.com/jupyter-incubator/sparkmagic/blob/master/sparkmagic/example_config.json
@@ -176,7 +180,7 @@ RUN echo 'export HADOOP_USER_NAME=${JUPYTERHUB_USER}' >> ~/.bashrc && \
     </property>\n\
 </configuration>\n' > ~/.beeline/beeline-hs2-connection.xml && \
    echo '#!/usr/bin/env bash\n\
-sed -ie "s,JUPYTERHUB_USER,${JUPYTERHUB_USER},g" ~/.beeline/beeline-hs2-connection.xml\n' > ~/.renkurc
+sed -i -e "s,JUPYTERHUB_USER,${JUPYTERHUB_USER},g" ~/.beeline/beeline-hs2-connection.xml\n' > ~/.renkurc
 
 # install the python dependencies
 COPY requirements.txt environment.yml /tmp/
