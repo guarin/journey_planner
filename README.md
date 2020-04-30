@@ -1,4 +1,4 @@
-# Final Assignment: Robust Journey Planning
+## Final Assignment: Robust Journey Planning
 
 ** Important -- this is a preview of the final project **
 
@@ -8,9 +8,10 @@ The final assignment is to be done in **groups of 4 or 5**.
 
 ## Important dates
 
-The assignment (clear, well-annotated notebook; report-like), **with a short, 7max, video of your presentation** is due on **May 25th, noon** (note the change of date).
+The assignment (clear, well-annotated notebook; report-like), **with a short, 7max, video of your presentation** is due on **Monday May 25th, 12:00 (noon) CET** (note the change of date).
 
-Instead of oral defense as initially planned, we will organize short Q&A discussions of 10mins per group. The Q&A will be scheduled on **May 27th**, actual times to be discussed on a case by case basis with each group.
+Instead of oral defense as initially planned, we will organize short Q&A discussions of 6mins per group. The Q&A will be scheduled on **Wednesday May 27th, 13:00 - 17:30 CET** - tentatively, actual times to be discussed on a case by
+case basis.
 
 ## Problem Motivation
 
@@ -131,7 +132,7 @@ Next, work-out the risk-aware solution gradually - start with a simple predictiv
 
 ## References
 
-We offer a list of useful references as a starting point:
+We offer a list of useful references for those of you who want to push it further or learn more about it:
 
 * Adi Botea, Stefano Braghin, "Contingent versus Deterministic Plans in Multi-Modal Journey Planning". ICAPS 2015: 268-272.
 * Adi Botea, Evdokia Nikolova, Michele Berlingerio, "Multi-Modal Journey Planning in the Presence of Uncertainty". ICAPS 2013.
@@ -156,3 +157,4 @@ Also, you must assume that you have no real-time delays information at the time 
 However, this is not recommended, or it should come with a warning.
 Imagine from a user experience perspective, how would you react if you are being proposed a plan in which a connection is supposed to depart before you arrive.
 Furthermore, who would you blame if the plan fails: the planner that came up with a theoretically infeasible plan, or the operator who respected their schedule?
+
