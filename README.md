@@ -4,7 +4,7 @@
 
 It is available now to give you a sense of what to expect so that you can start working on this project as you do the exercises and homeworks (they are related). It is 80% correct, but we may still change some of the assumptions as we are getting more data.
 
-The final assignment is to be done in **groups of 4 or, preferably, 5**.
+The final assignment is to be done in **groups of 4 or 5**.
 
 ## Important dates
 
