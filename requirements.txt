@@ -1,3 +1,11 @@
 pandas
+numpy
 matplotlib
 pyhive[hive]
+pykafka
+bokeh
+pyproj
+scikit-learn
+statsmodels
+folium
+pycausalimpact

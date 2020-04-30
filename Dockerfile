@@ -182,6 +182,9 @@ RUN echo 'export HADOOP_USER_NAME=${JUPYTERHUB_USER}' >> ~/.bashrc && \
    echo '#!/usr/bin/env bash\n\
 sed -i -e "s,JUPYTERHUB_USER,${JUPYTERHUB_USER},g" ~/.beeline/beeline-hs2-connection.xml\n' > ~/.renkurc
 
+# install bokeh extensions
+RUN /opt/conda/bin/jupyter labextension install -y --log-level=INFO @bokeh/jupyter_bokeh
+
 # install the python dependencies
 COPY requirements.txt environment.yml /tmp/
 RUN conda env update -q -f /tmp/environment.yml && \
