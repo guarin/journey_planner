@@ -305,10 +305,10 @@ This section will be updated with the Frequently Asked Questions during the cour
 ##### 1 - Q: Do we need to take into account walking times at the connections?
 * **A**: Yes, but since we do not have the details of the platforms at each location, we can use a universal formula to come up with a reasonable walking time.
 We must also allow time for transfers between different modes of transports, such as from bus to tramways.
-You can use the transfer time information available from `transfers.txt` from the [timetables](#timetable-data).
+You can use the transfer time information available from `transfers.txt` from the [timetables](#time-table-data).
 Otherwise, we assume that `2min` mininum are required for transfers within a same location
 (i.e. same lat,lon coordinates), to which you add _1min per 50m_ walking time
-to connect two stations that at most _500m_ appart, on a straight line distance between their two lat,lon. 
+to connect two stations that are at most _500m_ appart, on a straight line distance between their two lat,lon. 
 
 ##### 2 - Q: Can we assume statistical independence between the observed delays?
 * **A**: Yes, see simplifying assumptions in **Problem Description**.
