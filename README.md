@@ -244,7 +244,7 @@ The other files are:
 Figure 1. better illustrates the above concepts relating stops, routes, trips and stop times on a real example (route _11-3-A-j19-1_, direction _0_)
 
 
- ![journeys](https://renku.iccluster.epfl.ch/gitlab/dslab-2020-staff/final_project/raw/master/data/journeys.svg)
+ ![journeys](https://renku.iccluster.epfl.ch/gitlab/dslab2020/final_project/raw/master/data/journeys.svg)
  
  _Figure 1._ Relation between stops, routes, trips and stop times. The vertical axis represents the stops along the route,
              the horizontal axis represents the time of day on a non-linear scale. Solid lines connecting the stops correspond to trips.
