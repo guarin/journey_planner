@@ -190,5 +190,8 @@ COPY requirements.txt environment.yml /tmp/
 RUN conda env update -q -f /tmp/environment.yml && \
     /opt/conda/bin/pip install -r /tmp/requirements.txt && \
     conda clean -y --all && \
+    jupyter labextension install @pyviz/jupyterlab_pyviz --no-build && \
+    jupyter lab build -y && \
+    jupyter lab clean -y && \
     conda env export -n "root"
 
