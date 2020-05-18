@@ -3,7 +3,7 @@ import pandas as pd
 import collections
 
 
-Connection = collections.namedtuple('Connection', 'start_id start_time line_id transport_type stop_time stop_id')
+Connection = collections.namedtuple('Connection', 'start_id start_time line_id transport_type stop_time stop_id delay_probability delay_parameter')
 
 class JourneyFinder:
     
@@ -15,13 +15,11 @@ class JourneyFinder:
         self._departure_station_id = None
     
     def find(self, departure_station_id, arrival_station_id, arrival_time, 
-             min_probability=0.9, max_probability=0.999999, transfer_time=120, 
-             delay_probability=0.01, delay_parameter=0.005):
+             min_probability=0.9, max_probability=0.999999, transfer_time=120):
         self._departure_station_id = departure_station_id
         self._stations = find(self.connections, self.footpaths, self._unique_stations, 
                               departure_station_id, arrival_station_id, arrival_time, 
-                             min_probability, max_probability, transfer_time, delay_probability,
-                             delay_parameter)
+                             min_probability, max_probability, transfer_time)
         
     def best_journeys(self):
         return best_journeys(self._stations, self._departure_station_id)
@@ -29,10 +27,10 @@ class JourneyFinder:
         
         
 def find(connections, footpaths, unique_stations, departure_station_id, arrival_station_id, arrival_time, 
-             min_probability, max_probability, transfer_time, delay_probability, delay_parameter):
+             min_probability, max_probability, transfer_time):
     
     stations = {station_id: (0.0, -1, []) for station_id in unique_stations}
-    stations[arrival_station_id] = (1.0, arrival_time, [(None, 1.0, Connection(arrival_station_id, arrival_time, None, None, None, None))])
+    stations[arrival_station_id] = (1.0, arrival_time, [(None, 1.0, Connection(arrival_station_id, arrival_time, None, None, None, None, None, None))])
     departure_min_time = -1
     start_index = np.argmax(np.array([c.stop_time for c in connections]) <= arrival_time)
     foot_counter = 0
@@ -45,7 +43,7 @@ def find(connections, footpaths, unique_stations, departure_station_id, arrival_
             start_p, start_min_time, start_connections = stations[c.start_id]
             if c.start_time >= start_min_time:
                 # calculate best probability to catch any of the connections departing from stop
-                probabilities = [(index, p * (1 - (stop.line_id != c.line_id)*delay_probability*np.exp(-delay_parameter * (stop.start_time - c.stop_time - transfer_time)))) for index, (_, p, stop) in enumerate(stop_connections) if (((stop.line_id == c.line_id) and (stop.start_time >= c.stop_time)) or (stop.start_time >= c.stop_time + transfer_time))]
+                probabilities = [(index, p * (1 - (stop.line_id != c.line_id)*c.delay_probability*np.exp(-c.delay_parameter * (stop.start_time - c.stop_time - transfer_time)))) for index, (_, p, stop) in enumerate(stop_connections) if (((stop.line_id == c.line_id) and (stop.start_time >= c.stop_time)) or (stop.start_time >= c.stop_time + transfer_time))]
                 if probabilities:
                     index, p = max(probabilities, key=lambda x: x[1])
 
@@ -71,7 +69,7 @@ def find(connections, footpaths, unique_stations, departure_station_id, arrival_
                                         previous = previous_connections[-1]
 
                                     if not previous_connections or not ((previous[1] > p) and (previous[2].start_time > previous_departure_time)):
-                                        previous_connections.append((index, p, Connection(previous_id, previous_departure_time, f'foot:{foot_counter}', 'foot', previous_departure_time + walk_time, c.start_id)))
+                                        previous_connections.append((index, p, Connection(previous_id, previous_departure_time, f'foot:{foot_counter}', 'foot', previous_departure_time + walk_time, c.start_id, 0, 0)))
                                         foot_counter += 1
                                         max_p = max(p, previous_p)
                                         if max_p >= max_probability:
@@ -96,7 +94,7 @@ def to_df(journey):
     for p, c in journey:
         transfers.add(c.line_id)
         values.append([*c, p, len(transfers), 0])
-    df = pd.DataFrame(values, columns=['start_id', 'start_time', 'line_id', 'transport_type', 'stop_time', 'stop_id', 'probability', 'transfers', 'path'])
+    df = pd.DataFrame(values, columns=['start_id', 'start_time', 'line_id', 'transport_type', 'stop_time', 'stop_id', 'delay_probability', 'delay_parameter', 'probability', 'transfers', 'path'])
     df['transfers'] = len(transfers)
     return df
 

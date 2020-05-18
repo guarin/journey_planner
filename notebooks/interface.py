@@ -18,6 +18,6 @@ def journeys():
     arrival_station_id = id_from_name(stations, jp.arrival_station_widget.value)
     arrival_time = int(pd.to_datetime(jp.arrival_time_widget.value).timestamp())
     min_probability = jp.min_probability_widget.value
-    journey_finder.find(departure_station_id, arrival_station_id, arrival_time, min_probability=min_probability, delay_probability=0.5)
+    journey_finder.find(departure_station_id, arrival_station_id, arrival_time, min_probability=min_probability)
     best_journeys = journey_finder.best_journeys()
     return JourneyVisualization(best_journeys, stations, arrival_time).interface
