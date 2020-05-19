@@ -192,3 +192,8 @@ RUN conda env update -q -f /tmp/environment.yml && \
     conda clean -y --all && \
     conda env export -n "root"
 
+RUN conda env update -q -f /tmp/environment.yml && \
+    /opt/conda/bin/pip install -r /tmp/requirements.txt && \
+    conda install hdfs3 -c conda-forge -y -q && \ 
+    conda clean -y --all && \
+    conda env export -n "root"
