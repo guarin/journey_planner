@@ -39,6 +39,8 @@ class JourneyVisualization:
             
         
     def _timetable(self, x, y):
+        if self.solutions.empty:
+            return (hv.Points((0, 0)).opts(alpha=0) * hv.Text(0, 0, 'No Journeys Found').opts(color='firebrick')).opts(xlim=(-1, 1), xaxis=None, yaxis=None, show_frame=False, toolbar=None)
         stop_time = self.stop_time * 10**3
         time_delta = stop_time - self.solutions['start_time'].min()
         boxes_opts = {
