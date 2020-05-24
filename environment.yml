@@ -5,4 +5,5 @@ dependencies:
   - python=3.7.6
   - jupyterlab=2.1.1
   - geoviews-core
+  - libhdfs3
 prefix: "/opt/conda"
