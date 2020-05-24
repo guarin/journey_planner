@@ -1,4 +1,5 @@
 import dummy_data
+import data
 from journey_planner import JourneyPlanner, id_from_name
 from journey_finder import JourneyFinder
 from journey_visualization import JourneyVisualization
@@ -7,7 +8,7 @@ import pandas as pd
 import panel as pn
 pn.extension()
 
-connections, footpaths, stations = dummy_data.load_zurich()
+connections, footpaths, stations = data.load_data()
 jp = JourneyPlanner(stations)
 journey_planner = jp.interface
 journey_finder = JourneyFinder(connections, footpaths)

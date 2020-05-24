@@ -18,7 +18,7 @@ class JourneyVisualization:
         self.line_aggregate = aggregate_lines(self.solutions)
         self.journey_aggregate = aggregate_journey(self.solutions)
         
-        self.timetable_hover = HoverTool(tooltips=[('Line', '@line_id')])
+        # self.timetable_hover = HoverTool(tooltips=[('Trip', '@trip_id')])
         self.timetable_tap_stream = self._timetable_tap_stream()
         self._timetable = hv.DynamicMap(self._timetable, streams=[self.timetable_tap_stream])
         self.timetable = pn.pane.HoloViews(self._timetable)
@@ -52,7 +52,8 @@ class JourneyVisualization:
                 ('Departure Time', '@departure'), 
                 ('Arrival Time', '@arrival'),
                 ('Travel Type', '@transport_type'),
-                ('Line', '@line_id')])],
+                ('Line', '@line_text'),
+                ('Trip', '@trip_id')])],
         }
         opts = {
             'height': int(self.solutions['path'].max() + 3) * 50,
@@ -69,7 +70,7 @@ class JourneyVisualization:
         boxes = hv.Rectangles(
             self.line_aggregate, 
             ['start_time', 'y_min', 'stop_time', 'y_max'], 
-            ['color', 'station_name', 'station_name_stop', 'departure', 'arrival', 'transport_type', 'line_id']
+            ['color', 'station_name', 'station_name_stop', 'departure', 'arrival', 'transport_type', 'trip_id', 'line_text']
         ).opts(**boxes_opts)
         text = self._timetable_text()
         stop_line = hv.VLine(stop_time).opts(line_width=1, line_color='red')
@@ -83,11 +84,7 @@ class JourneyVisualization:
             start_time = connection['start_time']
             y = connection['y_min']
             icon = transport_icons[connection['transport_type']]
-            # TODO print real short names
-            if connection['transport_type'] != 'foot':
-                short_line = int(connection['line_id'].split(':')[-1])
-            else:
-                short_line = ''
+            short_line = connection['line_text']
             texts.append(hv.Text(x=start_time, y=y - 0.15, text=f'{icon}{short_line}', halign='left', valign='top', fontsize=fontsize))
         
         for _, journey in self.journey_aggregate.iterrows():
@@ -113,7 +110,7 @@ class JourneyVisualization:
         }
         selected_path = int(np.clip(np.round(y), 0, self.journey_aggregate['path'].max()))
         color_path = gv.Path(self.map_path_data, ['lat', 'lon'], ['color', 'path']).opts(color='color', **opts)
-        hover_path = gv.Path(self.map_path_data, ['lat', 'lon'], ['line_id']).opts(line_alpha=0, tools=['hover'], **opts)
+        hover_path = gv.Path(self.map_path_data, ['lat', 'lon'], ['trip_id']).opts(line_alpha=0, tools=['hover'], **opts)
         return self.map_tiles * (color_path * hover_path).select(path=selected_path)
     
     def _stations(self, selected_path):
@@ -151,14 +148,9 @@ def add_station_info(solutions, stations):
 
 
 def add_color(solutions, colormap='Category20'):
-    def line_category(line_id):
-        if line_id.startswith('foot'):
-            return 'foot'
-        else:
-            return line_id
-    categories = {line_category(line_id) for line_id in solutions['line_id'].unique()}
+    categories = set(solutions['line_text'].unique())
     color_dict = {category: color for category, color in zip(categories, itertools.cycle(hv.Cycle(colormap).values))}
-    solutions['color'] = solutions['line_id'].map(lambda k: color_dict[line_category(k)])
+    solutions['color'] = solutions['line_text'].map(lambda k: color_dict[k])
     return solutions
 
 
@@ -178,13 +170,14 @@ def aggregate_lines(solutions):
     """Aggregates sequential connections on the same line to a single connection"""
     aggregated = (
         solutions
-        .groupby(['path', 'line_id'])
+        .groupby(['path', 'trip_id'])
         .agg({
             'start_id': 'first',
             'start_time': 'first',
             'start_time_dt': 'first',
-            'line_id': 'first', 
+            'trip_id': 'first', 
             'transport_type': 'first',
+            'line_text': 'first',
             'probability': 'last',
             'stop_time': 'last',
             'stop_time_dt': 'last',
@@ -222,7 +215,7 @@ def aggregate_journey(solutions):
         })
     )
     travel_time = (aggregated['stop_time'] - aggregated['start_time'])
-    hours = ((travel_time // 3600_000) % 24).astype(str)
+    hours = ((travel_time // 3_600_000) % 24).astype(str)
     hours.loc[hours != '0'] += 'h '
     hours.loc[hours == '0'] = ''
     minutes = ((travel_time // 60_000) % 60).astype(str)
@@ -236,7 +229,7 @@ def aggregate_journey(solutions):
 def map_path_data(solutions):
     aggregated = (
         solutions
-        .groupby(['path', 'line_id'])
+        .groupby(['path', 'trip_id'])
         .agg({
             'lat': list,
             'lon': list,

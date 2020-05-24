@@ -4,9 +4,9 @@ import collections
 import math
 
 
-EMPTY_DF = pd.DataFrame([], columns=['start_id', 'start_time', 'line_id', 'transport_type', 'stop_time', 'stop_id', 'delay_probability', 'delay_parameter', 'probability', 'transfers', 'path'])
+EMPTY_DF = pd.DataFrame([], columns=['start_id', 'start_time', 'trip_id', 'transport_type', 'line_text', 'stop_time', 'stop_id', 'delay_probability', 'delay_parameter', 'probability', 'transfers', 'path'])
 
-Connection = collections.namedtuple('Connection', 'start_id start_time line_id transport_type stop_time stop_id delay_probability delay_parameter')
+Connection = collections.namedtuple('Connection', 'start_id start_time trip_id transport_type line_text stop_time stop_id delay_probability delay_parameter')
 
 class JourneyFinder:
     """Optimal journey finder which holds results of found journeys
@@ -124,7 +124,7 @@ def find(connections, footpaths, unique_stations, departure_station_id, arrival_
     stations = {station_id: (0.0, -1, []) for station_id in unique_stations}
     
     # add dummy connection to the arrival station
-    stations[arrival_station_id] = (1.0, arrival_time, [(None, 1.0, Connection(arrival_station_id, arrival_time, '', None, None, None, None, None))])
+    stations[arrival_station_id] = (1.0, arrival_time, [(None, 1.0, Connection(arrival_station_id, arrival_time, '', None, None, None, None, None, None))])
     
     # departure_min_time is unconstrained until a journey
     # from departure_station to arrival_station is found
@@ -158,9 +158,10 @@ def find(connections, footpaths, unique_stations, departure_station_id, arrival_
                 probabilities = [(0, 0.0)] * len(stop_connections)
                 for i, (_, p, stop) in enumerate(stop_connections):
                     if stop.start_time >= c.stop_time:
-                        if c.line_id == stop.line_id:
+                        if c.trip_id == stop.trip_id:
                             probabilities[i] = (i, p)
-                        elif len(stop.line_id) == 0:
+                        elif len(stop.trip_id) == 0:
+                            # stop == arrival_station
                             probabilities[i] = (i, p-p*c.delay_probability*math.exp(-c.delay_parameter * (stop.start_time - c.stop_time)))
                         elif stop.start_time >= c.stop_time + transfer_time:
                             probabilities[i] = (i, p-p*c.delay_probability*math.exp(-c.delay_parameter * (stop.start_time - c.stop_time - transfer_time)))
@@ -211,7 +212,7 @@ def find(connections, footpaths, unique_stations, departure_station_id, arrival_
                                     # the last connection added to the start_station of the footpath
                                     if not previous_connections or not ((previous[1] > p) and (previous[2].start_time > previous_departure_time)):
                                         # add new connection to start_station of footpath
-                                        previous_connections.append((index, p, Connection(previous_id, previous_departure_time, f'foot:{foot_counter}', 'foot', previous_departure_time + walk_time, c.start_id, 0, 0)))
+                                        previous_connections.append((index, p, Connection(previous_id, previous_departure_time, f'foot:{foot_counter}', 'foot', '', previous_departure_time + walk_time, c.start_id, 0, 0)))
                                         foot_counter += 1
                                         
                                         # check if footpath followed by connection should be considered to arrive for sure
@@ -245,9 +246,9 @@ def to_df(journey):
     values = []
     transfers = set()
     for p, c in journey:
-        transfers.add(c.line_id)
+        transfers.add(c.trip_id)
         values.append([*c, p, len(transfers), 0])
-    df = pd.DataFrame(values, columns=['start_id', 'start_time', 'line_id', 'transport_type', 'stop_time', 'stop_id', 'delay_probability', 'delay_parameter', 'probability', 'transfers', 'path'])
+    df = pd.DataFrame(values, columns=['start_id', 'start_time', 'trip_id', 'transport_type', 'line_text', 'stop_time', 'stop_id', 'delay_probability', 'delay_parameter', 'probability', 'transfers', 'path'])
     df['transfers'] = len(transfers)
     return df
 

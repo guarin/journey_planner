@@ -34,16 +34,17 @@ class JourneyPlanner:
         self.default_departure_id = id_from_name(stations, self.default_departure_station)
         self.default_arrival_id = id_from_name(stations, self.default_arrival_station)
         zurich = stations.loc[self.default_departure_id]
-        self.stations = stations[
-            (stations['lat'] >= zurich['lat'] - delta)
-            & (stations['lat'] <= zurich['lat'] + delta)
-            & (stations['lon'] >= zurich['lon'] - delta)
-            & (stations['lon'] <= zurich['lon'] + delta)
-        ]
+        self.stations = stations
+        # [
+        #     (stations['lat'] >= zurich['lat'] - delta)
+        #     & (stations['lat'] <= zurich['lat'] + delta)
+        #     & (stations['lon'] >= zurich['lon'] - delta)
+        #     & (stations['lon'] <= zurich['lon'] + delta)
+        # ]
         self.station_names = list(self.stations['station_name'])
         
-        self.default_arrival_time = datetime.datetime.fromisoformat('2018-04-01 19:30:00')
-        self.default_min_success_probability = 0.9
+        self.default_arrival_time = datetime.datetime.fromisoformat('2019-05-06 15:30:00')
+        self.default_min_success_probability = 0
         self.tiles = gv.tile_sources.CartoLight()
         self.unselected_hover = HoverTool(tooltips=[('', '@station_name')])
         self.departure_hover = HoverTool(tooltips=[('Departure Station', '@station_name')])
