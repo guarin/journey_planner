@@ -28,22 +28,16 @@ def set_to_closest_station(stations, widget, lat, lon):
         
 class JourneyPlanner:
     
-    def __init__(self, stations, delta=0.1):
-        self.default_departure_station = 'Zürich, Bahnhofquai/HB'
-        self.default_arrival_station = 'Zürich Affoltern, Bahnhof'
+    def __init__(self, stations):
+        self.default_departure_station = 'Zürich HB'
+        self.default_arrival_station = 'Zürich, Auzelg'
         self.default_departure_id = id_from_name(stations, self.default_departure_station)
         self.default_arrival_id = id_from_name(stations, self.default_arrival_station)
         zurich = stations.loc[self.default_departure_id]
         self.stations = stations
-        # [
-        #     (stations['lat'] >= zurich['lat'] - delta)
-        #     & (stations['lat'] <= zurich['lat'] + delta)
-        #     & (stations['lon'] >= zurich['lon'] - delta)
-        #     & (stations['lon'] <= zurich['lon'] + delta)
-        # ]
         self.station_names = list(self.stations['station_name'])
         
-        self.default_arrival_time = datetime.datetime.fromisoformat('2019-05-06 15:30:00')
+        self.default_arrival_time = datetime.datetime.fromisoformat('2019-05-06 12:30:00')
         self.default_min_success_probability = 0
         self.tiles = gv.tile_sources.CartoLight()
         self.unselected_hover = HoverTool(tooltips=[('', '@station_name')])

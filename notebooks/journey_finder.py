@@ -166,17 +166,16 @@ def find(connections, footpaths, unique_stations, departure_station_id, arrival_
             if c.start_time >= start_min_time:
 
                 # calculate probabilities to catch connections at stop_station
-                probabilities = [(0, 0.0)] * len(stop_connections)
+                probabilities = [(0, -1.0)] * len(stop_connections)
                 for i, (_, p, stop) in enumerate(stop_connections):
-                    if stop.start_time >= c.stop_time:
+                    if stop.start_time >= c.stop_time:                            
                         if c.trip_id == stop.trip_id:
                             probabilities[i] = (i, p)
-                        elif len(stop.trip_id) == 0:
-                            # stop == arrival_station
-                            probabilities[i] = (i, p-p*c.delay_probability*math.exp(-c.delay_parameter * (stop.start_time - c.stop_time)))
+                        elif (len(stop.trip_id) == 0) or (stop.transport_type == 'foot'):
+                            # len(stop.trip_id) == 0 means that stop is the fake connection at the arrival station!
+                            probabilities[i] = (i, p*(1-c.delay_probability*math.exp(-c.delay_parameter * (stop.start_time - c.stop_time))))
                         elif stop.start_time >= c.stop_time + transfer_time:
-                            probabilities[i] = (i, p-p*c.delay_probability*math.exp(-c.delay_parameter * (stop.start_time - c.stop_time - transfer_time)))
-                
+                            probabilities[i] = (i, p*(1-c.delay_probability*math.exp(-c.delay_parameter * (stop.start_time - c.stop_time - transfer_time))))
                 if probabilities:
                     # select follow up connection with highest probability
                     index, p = max(probabilities, key=lambda x: x[1])
@@ -237,7 +236,6 @@ def find(connections, footpaths, unique_stations, departure_station_id, arrival_
                                         # update entry of footpaths start_station
                                         max_p = max(p, previous_p)
                                         stations[previous_id] = (max_p, previous_min_time, previous_connections)
-
     return stations
 
 
