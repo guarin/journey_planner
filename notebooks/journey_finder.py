@@ -126,19 +126,30 @@ def find(connections, footpaths, unique_stations, departure_station_id, arrival_
     # add dummy connection to the arrival station
     stations[arrival_station_id] = (1.0, arrival_time, [(None, 1.0, Connection(arrival_station_id, arrival_time, '', None, None, None, None, None, None))])
     
-    # departure_min_time is unconstrained until a journey
+    # departure_min_time is unconstrained until a journey
     # from departure_station to arrival_station is found
     departure_min_time = -1
+    
+    # increases by 1 for every footpath connection that is added
+    # is used to generate a unique trip_id for every footpath
+    foot_counter = 0
+    
+    # explore stations that can be reached by foot from arrival_station
+    # from each such station we add a connection to the arrival_station
+    for start_id, walktime in footpaths.get(arrival_station_id, []):
+        _, _, start_connections = stations[start_id]
+        departure_time = arrival_time - walktime
+        new_connection = (0, 1.0, Connection(start_id, departure_time, f'foot:{foot_counter}', 'foot', '', arrival_time, arrival_station_id, 0, 0))
+        start_connections.append(new_connection)
+        if start_id == departure_station_id:
+            departure_min_time = departure_time
+        stations[start_id] = (1.0, departure_time, start_connections)
+        foot_counter += 1
 
     # find index of the first connection in the connections list
     # that arrives before/at the arrival_time (all later connections
     # are ignored)
     start_index = np.argmax(np.array([c.stop_time for c in connections]) <= arrival_time)
-
-    # increases by 1 for every footpath connection that is added
-    # is used to generate a unique trip_id for every footpath
-    foot_counter = 0
-
 
     for c in connections[start_index:]:
         if c.stop_time < departure_min_time:
