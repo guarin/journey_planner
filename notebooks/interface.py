@@ -1,4 +1,3 @@
-import dummy_data
 import data
 from journey_planner import JourneyPlanner, id_from_name
 from journey_finder import JourneyFinder

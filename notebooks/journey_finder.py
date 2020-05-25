@@ -37,7 +37,7 @@ class JourneyFinder:
         """Returns best journeys"""
         return best_journeys(self._stations, self._departure_station_id)
 
-# Description of the journey find algorithm            
+# Description of the journey finding algorithm            
 # =========================================        
 # The find function maintains one datastructure and a couple of constraints
 # 
