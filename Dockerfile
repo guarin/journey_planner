@@ -189,6 +189,7 @@ RUN /opt/conda/bin/jupyter labextension install -y --log-level=INFO @bokeh/jupyt
 COPY requirements.txt environment.yml /tmp/
 RUN conda env update -q -f /tmp/environment.yml && \
     /opt/conda/bin/pip install -r /tmp/requirements.txt && \
+    conda install hdfs3 -c conda-forge -y -q && \  
     conda clean -y --all && \
     jupyter labextension install @pyviz/jupyterlab_pyviz --no-build && \
     jupyter lab build -y && \
