@@ -1,7 +1,10 @@
 name: "base"
 channels:
-  - defaults
-# dependencies:
-# - add packages here
-# - one per line
+  - conda-forge
+dependencies:
+  - python=3.7.6
+  - jupyterlab=2.1.1
+  - geoviews-core
+  - libhdfs3
+  - hdfs3
 prefix: "/opt/conda"
