@@ -12,6 +12,12 @@ conda env create -f local_environment.yml
 jupyter labextension install @pyviz/jupyterlab_pyviz
 ```
 
+If there are any issues run:
+```
+conda env create -f local_environment_export.yml
+jupyter labextension install @pyviz/jupyterlab_pyviz
+```
+
 **Journey Planner Interface**
 ![](images/journey_planner.png)
 
