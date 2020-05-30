@@ -1,0 +1,9 @@
+name: "journey_planner"
+channels:
+  - conda-forge
+dependencies:
+  - python=3.7.6
+  - jupyterlab=2.1.1
+  - geoviews-core
+  - libhdfs3
+  - hdfs3
