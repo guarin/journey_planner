@@ -6,6 +6,8 @@ Robust journey planner for swiss public transport network taking possible delays
 
 A short video presenting the project can be found [here](https://www.youtube.com/watch?v=tZWT6d0ZCrg&feature=youtu.be).
 
+---
+
 **Installation**
 ```
 conda env create -f local_environment.yml
@@ -17,6 +19,8 @@ If there are any issues run:
 conda env create -f local_environment_export.yml
 jupyter labextension install @pyviz/jupyterlab_pyviz
 ```
+
+---
 
 **Journey Planner Interface**
 ![](images/journey_planner.png)
